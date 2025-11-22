@@ -1,6 +1,15 @@
 # Sentinel-Auth
 This project demonstrates production-ready engineering skills across backend, security, monitoring, and full-stack development - showcasing the ability to build complete, enterprise-grade systems with comprehensive observability.
 
+1. Sentinel-Auth Core Service
+- Key Features to Showcase:
+- Secure password hashing with Argon
+- Distributed rate limiting with Redis
+- JWT with refresh token rotation
+- Device fingerprinting
+- Audit logging
+
+
 SentinelAuth - Technology Stack & Skills Showcase
 Core Technology Stack
 *Backend (.NET Ecosystem)*
