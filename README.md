@@ -5,7 +5,15 @@ The App is a secure authentication system buikt for handling a million users
 • Login flows break when latency increases at scale.
 • Store credentials safely and respond to mass credential stuffing.
 
-# Technical System overview
+# Technical Skills Demonstrated
+🚀 Advanced Backend Development
+- High-Concurrency Architecture
+- Designing for 1M+ users
+- Clean Architecture - Domain-driven design principles
+- Distributed Systems - Multi-service coordination
+- Performance Optimization - Sub-100ms latency targets
+
+# System overview
 This project demonstrates production-ready engineering skills across backend, security, monitoring, and full-stack development - showcasing the ability to build complete, enterprise-grade systems with comprehensive observability. 
 
 1. Sentinel-Auth Core Service
@@ -41,15 +49,6 @@ Infrastructure & DevOps
 - Oracle Cloud (OCI) - Cloud infrastructure and deployment
 - Cloudflare - CDN, SSL, and security
 - Linux/Ubuntu - Server administration
-
-
-#Technical Skills Demonstrated
-🚀 Advanced Backend Development
-- High-Concurrency Architecture - Designing for 1M+ users
-- Clean Architecture - Domain-driven design principles
-- Distributed Systems - Multi-service coordination
-- Performance Optimization - Sub-100ms latency targets
-
 
 📊 Data Visualization & Monitoring
 - Streamlit Development - Real-time dashboard creation
