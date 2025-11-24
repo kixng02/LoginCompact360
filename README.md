@@ -5,6 +5,12 @@ The App is a secure authentication system built for handling a million plus user
 - Login flows break when latency increases at scale.
 - Store credentials safely and respond to mass credential stuffing.
 
+What does the App actually do?
+User → Passkey Auth → Sentinel System → [App1, App2, App3...]
+           ↑                  ↑
+    Authentication      Authorization & Management
+
+
 # Technical Skills Demonstrated
 🚀 Advanced Backend Development
 - High-Concurrency Architecture
