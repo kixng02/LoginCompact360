@@ -1,64 +1,42 @@
-# 🔒 Sentinel Auth - .NET Identity Ecosystem
+# 🔒 CredCompact 360 - Credential Stuffing Detection and Alerting System
 A production-ready authentication and authorization system built with .NET Core, designed to scale to millions of users.
 
-Sentinel Auth provides a centralized identity management platform that enables Single Sign-On (SSO) across multiple applications, robust security features, and enterprise-grade scalability.
+The .NET Core backend logs every failed login attempt to a dedicated Postgres auditing table. A separate background worker analyzes this table for patterns (e.g., failed attempts across many accounts from one IP) and triggers alerts. k6 simulates a continuous, distributed credential stuffing attack.
 
-# What Problem Does This Solve?
-Imagine your organization has 10+ applications, each with its own login system. Users struggle with multiple passwords, IT spends hours managing access, and security becomes a nightmare. Sentinel Auth solves this by providing:
+A service that records every critical security action (login, logout, password change, permission grant) as an immutable, time-stamped record in a dedicated Postgres log table. k6 simulates heavy bursts of user activity to stress the write performance of the logging service.
 
-🔐 One Login, Many Apps - Single Sign-On across your entire ecosystem
-
-🛡️ Enterprise Security - Built-in MFA, threat detection, and compliance features
-
-📈 Massive Scalability - Architecture designed for 1,000,000+ concurrent users
-
-⚡ Rapid Integration - Simple setup for new and existing applications
+A system to handle immediate revocation of access tokens (e.g., after a password change or forced logout). The .NET Core API checks this list (which can be memory-cached from Postgres) on every request. k6 tests the performance hit of checking the TRL against the benefit of immediate revocation.
 
 
-# Key Features
-Authentication
+# 1. ⚙️ Real-Time Log Ingestion and Throttling
+- This feature focuses on securing the login endpoint and efficiently capturing the data needed for detection.
 
-✅ Single Sign-On (SSO) across multiple applications
+  .NET Core Backend (Login API)
+- Secure Hashing: Implement the login logic using a high-work-factor hashing algorithm like Argon2 (integrated via a custom PasswordHasher in ASP.NET Core Identity).Immediate Logging: After a failed login attempt, log the required metadata (IP address, timestamp, username/email, and device signal hash) to the LoginAttempts Postgres table asynchronously to avoid adding latency to the user's failed response.IP-Based
+- Throttling: Implement a lightweight, highly-cached rate limiter (e.g., using a Concurrent Dictionary or Redis in the .NET Core middleware) to enforce a hard limit on login attempts per IP address (e.g., 10 attempts per minute) to slow down simple, non-distributed attacks.
+- Postgres Schema: The primary table, LoginAttempts, must be indexed heavily on IPAddress and AttemptTime for fast queries by the detection worker.k6 Simulation: Design a low-volume, high-frequency test where a single k6 Virtual User (VU) sends login attempts from the same IP address to verify the IP throttling mechanism correctly returns HTTP 429 errors after the limit is hit.
 
-✅ Multi-Factor Authentication (MFA/2FA)
+# 2. 🕵️ Background Detection Worker (The Analyzer)
+- This is the core analysis engine that runs the detection logic..NET Core Backend (Worker Service):Implement a .NET Core Background Service (or a separate worker application using IHostedService) that runs on a schedule (e.g., every 5 minutes).
+- Detection Logic (Postgres Queries): The worker executes complex, optimized SQL queries against the LoginAttempts table to identify suspicious patterns.
+Key queries include
+- Query A (IP Fingerprint): Find all IP addresses that have failed logins against N unique usernames (e.g., $N > 50$) within the last hour.
+- Query B (Account Focus): Find all usernames that have received failed login attempts from M unique IP addresses (e.g., $M > 10$) within the last 10 minutes.Postgres
+- Optimization: These queries must use efficient GROUP BY and HAVING clauses, relying on the indexes to perform fast counts across millions of log records.
+- k6 Simulation: The main credential stuffing test. k6 VUs use a list of 10,000 unique usernames and 5 common passwords. They perform a continuous, distributed attack, generating millions of entries in the LoginAttempts table to ensure the worker's queries remain performant under load.
 
-✅ Social logins (Google, GitHub, Microsoft)
+# 3. 🚨 Alerting and Remediation PipelineOnce a suspicious pattern is identified, 
+- this feature handles the appropriate response..NET Core Backend (Alerting Module): Risk Scoring The detection worker (from Section 2) assigns a Risk Score (e.g., 0 to 100) to each suspicious IP address or username based on the magnitude of the attack.
+- Action Trigger:Low Score: Log an entry in a SecurityAlerts table.High Score (Mass Attack): Trigger an immediate email/Slack/SMS notification (e.g., via a simple .NET Core HttpClient call to a third-party service).
+- Remediation Action: For highly targeted accounts, the worker should call a secured internal API endpoint to force a temporary user account lockout or force password reset for affected accounts.
+- k6 Simulation: Include a test where the attack simulation is so severe that it exceeds the high-score threshold. The k6 VUs should then check the status of the "remediated" accounts (the ones targeted in the alert) and confirm they are now locked out, verifying the full end-to-end security pipeline.
 
-✅ Passwordless authentication
+# 4. 🗄️ Log Retention and ArchivingHandling the massive volume of data generated by a large-scale system is critical for long-term operational 
+- health.Postgres Strategy:Implement Table Partitioning in Postgres for the LoginAttempts table based on the AttemptTime column (e.g., monthly partitions). This dramatically improves the performance of the worker's queries (which typically only look at recent data) and simplifies archiving.Use a separate, less-indexed ArchiveLog table.
+- .NET Core Backend (Maintenance Service):Implement another scheduled .NET Core Background Service responsible for maintenance.
+- Archiving Logic: On a weekly basis, move all records older than a configured period (e.g., 90 days) from the highly-indexed LoginAttempts table into the ArchiveLog table or delete them entirely, ensuring the primary detection table remains fast and manageable.
+- k6 Simulation: While k6 doesn't directly test archiving, a stress test generating a month's worth of log data (simulated at a very fast pace) should be performed to measure the impact of the partitioning strategy on the detection worker's query times.
 
-✅ Device recognition and trust
-
-Authorization
-
-✅ Role-based access control (RBAC)
-
-✅ Permission-based authorization
-
-✅ API access management
-
-✅ Application-specific permissions
-
-Security
-
-✅ Brute force protection
-
-✅ Suspicious activity detection
-
-✅ Session management
-
-✅ Secure token management
-
-Enterprise Ready
-
-✅ Multi-tenant support
-
-✅ Audit logging
-
-✅ User provisioning
-
-✅ Scalable architecture
-
-# Key Performance Features
 - Distributed caching with Redis for session management
 - Database optimization for high-concurrency scenarios
 - Horizontal scaling support across multiple instances
