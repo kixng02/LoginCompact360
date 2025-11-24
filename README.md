@@ -78,15 +78,15 @@ Test scenarios include
 * cd Sentinel-Auth-.NET-Ecosystem
 
 2. Configure your environment
-cp appsettings.Example.json appsettings.Development.json
+* cp appsettings.Example.json appsettings.Development.json
 Update connection strings and secrets
 
 3. Run the application
-dotnet run --project Sentinel.Auth
+* dotnet run --project Sentinel.Auth
 
 4. Access the application
-Web Interface: https://localhost:7001
-API: https://localhost:7000
+* Web Interface: https://localhost:7001
+* API: https://localhost:7000
 
 # 🤝 Contributing
 We welcome contributions! Please see our Contributing Guide for details.
