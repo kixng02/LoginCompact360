@@ -1,3 +1,4 @@
+# CredCompact 360 (.NETCore Ecosystem)
 # 🔒 CredCompact 360 - Credential Stuffing Detection and Alerting System
 A production-ready authentication and authorization system built with .NET Core, designed to scale to millions of users.
 
