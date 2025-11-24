@@ -17,6 +17,7 @@ Imagine your organization has 10+ applications, each with its own login system. 
 
 # Key Features
 Authentication
+
 ✅ Single Sign-On (SSO) across multiple applications
 
 ✅ Multi-Factor Authentication (MFA/2FA)
@@ -26,4 +27,12 @@ Authentication
 ✅ Passwordless authentication
 
 ✅ Device recognition and trust
-                          
+
+Authorization
+✅ Role-based access control (RBAC)
+
+✅ Permission-based authorization
+
+✅ API access management
+
+✅ Application-specific permissions
