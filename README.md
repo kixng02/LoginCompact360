@@ -2,6 +2,8 @@
 # Credential Stuffing Detection and Alerting System
 A production-ready system built with .NET Core, designed to handle and scale a millions of users.
 (This tool is best suited for intergration with login forms)
+- The system acts as Second layer of protection on the your login form
+- The security admin can determine the geolaction they intend their users to be coming from; If a user logs in from a not permitted location the security team of your company gets alerted 
 - The .NET Core backend logs every failed login attempt to a dedicated Postgres auditing table. 
 - A separate background worker analyzes this table for patterns (e.g., failed attempts across many accounts from one IP) and triggers alerts. k6 simulates a continuous, distributed credential stuffing attack.
 - A service that records every critical security action (login, logout, password change, permission grant) as an immutable, time-stamped record in a dedicated Postgres log table.
@@ -23,9 +25,11 @@ A production-ready system built with .NET Core, designed to handle and scale a m
 - This feature focuses on securing the login endpoint and efficiently capturing the data needed for detection.
 
   .NET Core Backend (Login API)
-- Secure Hashing: Implement the login logic using a high-work-factor hashing algorithm like Argon2 (integrated via a custom PasswordHasher in ASP.NET Core Identity).Immediate Logging: After a failed login attempt, log the required metadata (IP address, timestamp, username/email, and device signal hash) to the LoginAttempts Postgres table asynchronously to avoid adding latency to the user's failed response.IP-Based
+- Secure Hashing: Implement the login logic using a high-work-factor hashing algorithm like Argon2 (integrated via a custom PasswordHasher in ASP.NET Core Identity).
+- Immediate Logging: After a failed login attempt, log the required metadata (IP address, timestamp, username/email, and device signal hash) to the LoginAttempts Postgres table asynchronously to avoid adding latency to the user's failed response.IP-Based
 - Throttling- Implement a lightweight, highly-cached rate limiter (e.g., using a Concurrent Dictionary or Redis in the .NET Core middleware) to enforce a hard limit on login attempts per IP address (e.g., 10 attempts per minute) to slow down simple, non-distributed attacks.
-- Postgres Schema- The primary table, LoginAttempts, must be indexed heavily on IPAddress and AttemptTime for fast queries by the detection worker.k6 Simulation: Design a low-volume, high-frequency test where a single k6 Virtual User (VU) sends login attempts from the same IP address to verify the IP throttling mechanism correctly returns HTTP 429 errors after the limit is hit.
+- Postgres Schema- The primary table, LoginAttempts, must be indexed heavily on IPAddress and AttemptTime for fast queries by the detection worker.
+- k6 Simulation: Design a low-volume, high-frequency test where a single k6 Virtual User (VU) sends login attempts from the same IP address to verify the IP throttling mechanism correctly returns HTTP 429 errors after the limit is hit.
 
 # 2. 🕵️ Background Detection Worker (The Analyzer)
 This is the core analysis engine that runs the detection logic.
