@@ -6,9 +6,8 @@ The App is a secure authentication system built for handling a million plus user
 - Store credentials safely and respond to mass credential stuffing.
 
 What does the App actually do?
-User → Passkey Auth → Sentinel System → [App1, App2, App3...]
-           ↑                  ↑
-    Authentication      Authorization & Management
+<img width="1070" height="174" alt="image" src="https://github.com/user-attachments/assets/7fc46fea-a780-4054-9e7c-e938a4d23d49" />
+
 
 
 # Technical Skills Demonstrated
