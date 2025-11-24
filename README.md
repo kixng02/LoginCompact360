@@ -74,8 +74,8 @@ Test scenarios include
 
 # Installation
 1. Clone the repository
-git clone https://github.com/kixng02/Sentinel-Auth-.NET-Ecosystem.git
-cd Sentinel-Auth-.NET-Ecosystem
+* git clone https://github.com/kixng02/Sentinel-Auth-.NET-Ecosystem.git
+* cd Sentinel-Auth-.NET-Ecosystem
 
 2. Configure your environment
 cp appsettings.Example.json appsettings.Development.json
