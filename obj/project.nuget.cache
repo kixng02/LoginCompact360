@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "pJFw9g+xWyU=",
+  "success": true,
+  "projectFilePath": "/Users/masi/Desktop/LC/LC360/LC360.csproj",
+  "expectedPackageFiles": [
+    "/Users/masi/.nuget/packages/blazorcomponentutilities/1.7.1/blazorcomponentutilities.1.7.1.nupkg.sha512",
+    "/Users/masi/.nuget/packages/blazorstrap/5.2.104/blazorstrap.5.2.104.nupkg.sha512",
+    "/Users/masi/.nuget/packages/blazorstrap.v5/5.2.104/blazorstrap.v5.5.2.104.nupkg.sha512",
+    "/Users/masi/.nuget/packages/microsoft.aspnetcore.app.internal.assets/10.0.0/microsoft.aspnetcore.app.internal.assets.10.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

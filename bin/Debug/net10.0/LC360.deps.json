@@ -1,0 +1,79 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v10.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v10.0": {
+      "LC360/1.0.0": {
+        "dependencies": {
+          "BlazorStrap": "5.2.104",
+          "BlazorStrap.V5": "5.2.104"
+        },
+        "runtime": {
+          "LC360.dll": {}
+        }
+      },
+      "BlazorComponentUtilities/1.7.1": {
+        "runtime": {
+          "lib/netstandard2.0/BlazorComponentUtilities.dll": {
+            "assemblyVersion": "1.7.1.0",
+            "fileVersion": "1.7.1.0"
+          }
+        }
+      },
+      "BlazorStrap/5.2.104": {
+        "dependencies": {
+          "BlazorComponentUtilities": "1.7.1"
+        },
+        "runtime": {
+          "lib/net9.0/BlazorStrap.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "BlazorStrap.V5/5.2.104": {
+        "dependencies": {
+          "BlazorComponentUtilities": "1.7.1",
+          "BlazorStrap": "5.2.104"
+        },
+        "runtime": {
+          "lib/net9.0/BlazorStrap.V5.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LC360/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "BlazorComponentUtilities/1.7.1": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-m73xpJYtSd7tlOowMslyAvWDipW9bOTWJzGnCSQJK9tm4fz6xXQZbAbTDydmV9bxhTrzmJMMRGsAEnSVZjWVjg==",
+      "path": "blazorcomponentutilities/1.7.1",
+      "hashPath": "blazorcomponentutilities.1.7.1.nupkg.sha512"
+    },
+    "BlazorStrap/5.2.104": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-ssRvQktZectT1xQCuua8gW9TeVhh8kRdDAII40Uh86SYhJV25a9s6d9mTqQR9X/eLwRd9Rdl8FGzWuuj6oLUvw==",
+      "path": "blazorstrap/5.2.104",
+      "hashPath": "blazorstrap.5.2.104.nupkg.sha512"
+    },
+    "BlazorStrap.V5/5.2.104": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-P91X6FKIbOM6ZV0iX1P3LN8hUHUTQqEiMRc7BUTqc9nXUgt3PsXXW2MnWLNXgvZS4LVElV22KCise7N70zhK5Q==",
+      "path": "blazorstrap.v5/5.2.104",
+      "hashPath": "blazorstrap.v5.5.2.104.nupkg.sha512"
+    }
+  }
+}
