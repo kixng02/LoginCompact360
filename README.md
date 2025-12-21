@@ -134,38 +134,8 @@ Test scenarios include
 - Smoke testing - Basic functionality under load
 
 
-# 🤝 Contributing
-We welcome contributions! Please see our Contributing Guide for details.
-Fork the repository
-
-- Create a feature branch (git checkout -b feature/amazing-feature)
-
-- Commit your changes (git commit -m 'Add amazing feature')
-
-- Push to the branch (git push origin feature/amazing-feature)
-
-- Open a Pull Request
 
 
-# Installation
-1. Clone the repository
-- git clone https://github.com/kixng02/CredCompact360.git
-- cd CredCompact360
-
-2. Frontend Setup (React + TypeScript)
-- cd frontend
-- npm install
-- npm run dev
-
-3. Security Dashboard Setup (Streamlit)
-- cd dashboard
-- pip install -r requirements.txt
-- streamlit run security_dashboard.py
-
-4. Backend Setup (.NET Core)
-- cd backend/CredCompact360.API
-- dotnet restore
-- dotnet run
 
 
 # Security Notice
