@@ -9,9 +9,9 @@
 @inject NavigationManager NavManager
 
 <div class="bg-white p-4 rounded shadow-sm">
-    <h3 class="text-center mb-4">Create an account</h3>
+    <h3 class="text-center mb-4">Create an accountMALI</h3>
 
-    <EditForm Model="_model" OnValidSubmit="HandleValidSubmit">
+    <EditForm Model="_model" OnValidSubmit="HandleValidSubmit" OnFieldChanged="HandleFieldChanged">
         <DataAnnotationsValidator />
         <ValidationSummary class="text-danger mb-3" />
 
@@ -20,8 +20,7 @@
             <label for="firstName" class="form-label">First name</label>
             <InputText id="firstName"
                        class="form-control"
-                       @bind-Value="_model.FirstName" 
-                       @oninput="UpdateButtonState" />
+                       @bind-Value="_model.FirstName" />
             <ValidationMessage For="@(() => _model.FirstName)" />
         </div>
 
@@ -30,8 +29,7 @@
             <label for="lastName" class="form-label">Last name</label>
             <InputText id="lastName"
                        class="form-control"
-                       @bind-Value="_model.LastName" 
-                       @oninput="UpdateButtonState" />
+                       @bind-Value="_model.LastName" />
             <ValidationMessage For="@(() => _model.LastName)" />
         </div>
 
@@ -41,19 +39,17 @@
             <InputText id="email"
                        type="email"
                        class="form-control"
-                       @bind-Value="_model.Email" 
-                       @oninput="UpdateButtonState" />
+                       @bind-Value="_model.Email" />
             <ValidationMessage For="@(() => _model.Email)" />
         </div>
 
         <!-- Password ----------------------------------------------------------->
         <div class="mb-3">
-            <label for="password" class="form-label">Passwords</label>
+            <label for="password" class="form-label">Password</label>
             <InputText id="password"
                        type="password"
                        class="form-control"
-                       @bind-Value="_model.Password" 
-                       @oninput="UpdateButtonState" />
+                       @bind-Value="_model.Password" />
             <ValidationMessage For="@(() => _model.Password)" />
         </div>
 
@@ -63,8 +59,7 @@
             <InputText id="confirmPassword"
                        type="password"
                        class="form-control"
-                       @bind-Value="_model.ConfirmPassword" 
-                       @oninput="UpdateButtonState" />
+                       @bind-Value="_model.ConfirmPassword" />
             <ValidationMessage For="@(() => _model.ConfirmPassword)" />
         </div>
 
@@ -120,6 +115,11 @@
                            !string.IsNullOrWhiteSpace(_model.ConfirmPassword);
         
         StateHasChanged();
+    }
+
+    private void HandleFieldChanged(FieldChangedEventArgs _)
+    {
+        UpdateButtonState();
     }
 
     private async Task HandleValidSubmit()
