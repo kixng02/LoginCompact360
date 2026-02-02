@@ -148,6 +148,5 @@ Always ensure proper authorization and compliance with local laws and regulation
 # 📄 License
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-*Built with ❤️ using .NET 8 - Ready for your next million-user application!*
 
 
