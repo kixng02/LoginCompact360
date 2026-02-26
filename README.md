@@ -1,8 +1,8 @@
 # LoginCompact 360 (.NET ecosystem)
-# documentation will be built using https://squidfunk.github.io/mkdocs-material/
 # Credential Stuffing Detection and Alerting System
 A production-ready system built with .NET Core, designed to handle and scale a millions of users.
 (This tool is best suited for intergration with login forms)
+- documentation will be built using https://squidfunk.github.io/mkdocs-material/
 - The system acts as Second layer of protection on the your login form
 - The security admin can determine the geolaction they intend their users to be coming from; If a user logs in from a not permitted location the security team of your company gets alerted 
 - The .NET Core backend logs every failed login attempt to a dedicated Postgres auditing table. 
