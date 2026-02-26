@@ -1,4 +1,5 @@
 # LoginCompact 360 (.NET ecosystem)
+# documentation will be built using https://squidfunk.github.io/mkdocs-material/
 # Credential Stuffing Detection and Alerting System
 A production-ready system built with .NET Core, designed to handle and scale a millions of users.
 (This tool is best suited for intergration with login forms)
