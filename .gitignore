@@ -58,4 +58,6 @@ dkms.conf
 bin/
 obj/
 .vs/
+appsettings.jsonbin/
+obj/
 appsettings.json
