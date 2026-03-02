@@ -1,56 +1,41 @@
 // Services/AuthService.cs
 using LC360.Models;
-using System.Net.Http.Json;
+using System.Collections.Concurrent;
 
 namespace LC360.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly HttpClient _httpClient;
+    // In-memory store: email -> password (plain text until PostgreSQL + bcrypt are wired up)
+    private static readonly ConcurrentDictionary<string, string> _users =
+        new(StringComparer.OrdinalIgnoreCase);
+
     private readonly ILogger<AuthService> _logger;
 
-    public AuthService(HttpClient httpClient, ILogger<AuthService> logger)
+    public AuthService(ILogger<AuthService> logger)
     {
-        _httpClient = httpClient;
         _logger = logger;
     }
 
     public async Task RegisterAsync(SignupRequest request)
     {
-        try
-        {
-            // Temporary: Simulate API call delay
-            await Task.Delay(1000);
-            
-            // For now, just log and accept all registrations
-            _logger.LogInformation("User registered: {Email}", request.Email);
-            
-            // In a real app, you would make an API call:
-            // var response = await _httpClient.PostAsJsonAsync("api/auth/register", request);
-            // response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Registration failed for {Email}", request.Email);
-            throw new Exception("Registration failed. Please try again.");
-        }
+        await Task.Delay(500);
+
+        if (!_users.TryAdd(request.Email, request.Password))
+            throw new Exception("An account with that email already exists.");
+
+        _logger.LogInformation("User registered: {Email}", request.Email);
     }
 
     public Task<bool> LoginAsync(string email, string password)
     {
-        // Implement later
-        return Task.FromResult(true);
-    }
+        if (_users.TryGetValue(email, out var stored) && stored == password)
+            return Task.FromResult(true);
 
-    public Task LogoutAsync()
-    {
-        // Implement later
-        return Task.CompletedTask;
-    }
-
-    public Task<bool> IsAuthenticatedAsync()
-    {
-        // Implement later
         return Task.FromResult(false);
     }
+
+    public Task LogoutAsync() => Task.CompletedTask;
+
+    public Task<bool> IsAuthenticatedAsync() => Task.FromResult(false);
 }

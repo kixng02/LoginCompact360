@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LC360")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+24e1437b9ba6785255b147f2fde026318b19e595")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fa02b4fb9b179aec8ee509f11dc9be810839f533")]
 [assembly: System.Reflection.AssemblyProductAttribute("LC360")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LC360")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -1,0 +1,106 @@
+Stage 1: Project Foundation & Infrastructure Setup
+
+Initialize the .NET Core solution (LC360 project already scaffolded)
+Create a new Supabase project and grab the connection string + API keys
+Set up Docker containers for Redis, Prometheus, and Grafana only (no self-hosted PostgreSQL needed)
+Configure appsettings.json with Supabase URL, anon key, JWT secret, and Redis connection
+Set up ASP.NET Core Identity with Argon2 password hashing
+
+
+Stage 2: Supabase Database Setup
+
+Use the Supabase Table Editor or SQL editor to create:
+
+LoginAttempts — indexed on IPAddress and AttemptTime
+SecurityAlerts — stores triggered threat events
+ArchiveLog — holds records older than 90 days
+TokenRevocationList (TRL) — tracks invalidated JWT tokens
+
+
+Enable Row Level Security (RLS) policies on all tables
+Enable Supabase Realtime on the SecurityAlerts table for live notifications
+Implement monthly table partitioning on LoginAttempts via SQL editor
+
+
+Stage 3: Authentication & Login API
+
+Integrate Supabase Auth for user registration and session management
+Build the login endpoint with JWT token issuance
+Implement IP-based rate limiting middleware — hard cap of 10 attempts/min per IP → HTTP 429
+On every failed login, asynchronously log metadata (IP, timestamp, username, device hash) to Supabase's LoginAttempts table via the Supabase SDK
+On every authenticated request, check the TRL in Supabase (Redis-cached) to enforce immediate token revocation
+
+
+Stage 4: Background Detection Worker
+
+Build an IHostedService that runs every 5 minutes
+Query Supabase via the .NET Supabase SDK or REST API for suspicious patterns:
+
+Query A (IP Fingerprint): IPs with failed logins against >50 unique usernames in the last hour
+Query B (Account Focus): Usernames attacked from >10 unique IPs in 10 minutes
+
+
+Assign a Risk Score (0–100) to each flagged IP/username based on attack magnitude
+Write results to the SecurityAlerts table in Supabase — Realtime will push these to the dashboard instantly
+
+
+Stage 5: Alerting & Remediation Pipeline
+
+Low Risk Score → write an entry to SecurityAlerts in Supabase
+High Risk Score → fire an HTTP notification via HttpClient to email/Slack/SMS (e.g., SendGrid, Twilio, or Slack webhook)
+Call a secured internal API endpoint to lock the targeted account or force a password reset in Supabase Auth
+Append remediation recommendations to each alert record
+
+
+Stage 6: Geolocation Filtering
+
+Integrate MaxMind GeoIP2 (or ip-api.com) to resolve IP addresses to countries/regions
+Allow security admins to configure a permitted geography list stored in a Supabase config table
+On each login attempt, compare the resolved location against the permitted list and flag violations
+Feed geolocation data into MapLibre GL JS for a visual threat map on the frontend
+
+
+Stage 7: Log Retention & Archiving Service
+
+Build a second IHostedService scheduled to run weekly
+Query LoginAttempts in Supabase for records older than 90 days
+Move them to the ArchiveLog table or export to Supabase Storage Buckets (as compressed JSON/CSV)
+Verify that monthly partitioning keeps the active LoginAttempts table lean and queries fast
+
+
+Stage 8: Monitoring Stack (Prometheus & Grafana)
+
+Instrument the .NET Core backend using prometheus-net to expose a /metrics endpoint
+Track key metrics:
+
+Login API p99 latency
+HTTP 500 error counts and Supabase connection errors
+Detection worker run count and high-risk alert count
+CPU/memory usage of the .NET Core process
+
+
+Configure Prometheus to scrape the metrics endpoint
+Build Grafana dashboards with alerting thresholds for anomalies
+
+
+Stage 9: Analytics Dashboard (Streamlit)
+
+Build a Python/Streamlit app that connects to Supabase using the supabase-py client
+Visualize security insights:
+
+Top 20 targeted accounts
+Suspicious IPs by geolocation
+Total failed login trends over time
+Active SecurityAlerts with risk scores
+
+
+Use Streamlit's live-reload to reflect near-real-time data from Supabase
+
+
+Stage 10: k6 Load & Performance Testing
+
+Smoke test: Single VU hammers the login endpoint from one IP → verify HTTP 429 kicks in after 10 attempts
+Credential stuffing simulation: Distribute 10,000 usernames × 5 passwords across multiple VUs to flood LoginAttempts
+Detection worker stress test: Run enough data through to trigger both Query A and Query B thresholds — confirm alerts appear in Supabase
+Full pipeline test: Confirm that a severe attack triggers account lockouts end-to-end via Supabase Auth
+Endurance test: Simulate a month's worth of data at speed to validate partition query performance

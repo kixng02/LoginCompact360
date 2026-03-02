@@ -1,38 +1,88 @@
 using LC360.Components;
-using BlazorStrap; // Make sure this is present (or BlazorStrap.V5 if you installed that specific package)
+using BlazorStrap;
+using Supabase;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ── Razor + Blazor + Controllers ─────────────────────────────────────────
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-// This registers the service AND creates the HttpClient for it automatically
-builder.Services.AddHttpClient<LC360.Services.IAuthService, LC360.Services.AuthService>(client =>
-{
-    // OPTIONAL: Set the base URL for your API if you know it
-     client.BaseAddress = new Uri("https://localhost:7000/"); 
-});
-// ADD THE BLRAZORSTRAP SERVICE HERE (This is the fix)
 builder.Services.AddBlazorStrap();
-// -------------------------------------------------------------------
+builder.Services.AddControllers();
 
+// ── Supabase Client ───────────────────────────────────────────────────────
+var supabaseUrl = builder.Configuration["Supabase:Url"]!;
+var supabaseKey = builder.Configuration["Supabase:SecretKey"]!;
 
+builder.Services.AddScoped<Supabase.Client>(_ =>
+    new Supabase.Client(supabaseUrl, supabaseKey, new SupabaseOptions
+    {
+        AutoRefreshToken = true,
+        AutoConnectRealtime = true
+    })
+);
 
+// ── JWT Authentication ────────────────────────────────────────────────────
+var jwtSecret = builder.Configuration["Jwt:Secret"]!;
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer           = true,
+            ValidateAudience         = true,
+            ValidateLifetime         = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer              = builder.Configuration["Jwt:Issuer"],
+            ValidAudience            = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey         = new SymmetricSecurityKey(
+                                           Encoding.UTF8.GetBytes(jwtSecret))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// ── HTTP Client (for alert notifications) ────────────────────────────────
+builder.Services.AddHttpClient();
+
+// ── App Services ──────────────────────────────────────────────────────────
+builder.Services.AddSingleton<LC360.Services.IAuthService, LC360.Services.AuthService>();
+
+// ── Memory Cache (for TRL caching) ───────────────────────────────────────
+builder.Services.AddMemoryCache();
+
+// ── Supabase Service ──────────────────────────────────────────────────────
+builder.Services.AddScoped<LC360.Services.SupabaseService>();
+
+// ── Build ─────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ── Middleware Pipeline ───────────────────────────────────────────────────
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
 app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
 app.UseHttpsRedirection();
-
+app.UseMiddleware<LC360.Components.RateLimitingMiddleware>();
+app.UseAuthentication();
+app.UseAuthorization();
 app.UseAntiforgery();
 
+// ── Prometheus Metrics Endpoint ───────────────────────────────────────────
+app.UseMetricServer();
+app.UseHttpMetrics();
+
+// ── Static + Razor + API Controllers ────────────────────────────────────
 app.MapStaticAssets();
+app.MapControllers();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

@@ -1,5 +1,6 @@
 @page "/signup"
 @layout LoginLayout
+@rendermode InteractiveServer
 
 @using LC360.Models                     @* DTO that holds the signup fields *@
 @using LC360.Services                  @* IAuthService interface *@
@@ -8,134 +9,161 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavManager
 
-<div class="bg-white p-4 rounded shadow-sm">
-    <h3 class="text-center mb-4">Create an accountMALI</h3>
+<div class="signup-page-container">
+    <div class="signup-panel">
+        <h3 class="text-center mb-4">Create an account</h3>
 
-    <EditForm Model="_model" OnValidSubmit="HandleValidSubmit" OnFieldChanged="HandleFieldChanged">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger mb-3" />
-
-        <!-- First name -------------------------------------------------------->
         <div class="mb-3">
             <label for="firstName" class="form-label">First name</label>
-            <InputText id="firstName"
-                       class="form-control"
-                       @bind-Value="_model.FirstName" />
-            <ValidationMessage For="@(() => _model.FirstName)" />
+            <input id="firstName" class="form-control" @bind="_model.FirstName" @bind:event="oninput" />
         </div>
 
-        <!-- Last name -------------------------------------------------------->
         <div class="mb-3">
             <label for="lastName" class="form-label">Last name</label>
-            <InputText id="lastName"
-                       class="form-control"
-                       @bind-Value="_model.LastName" />
-            <ValidationMessage For="@(() => _model.LastName)" />
+            <input id="lastName" class="form-control" @bind="_model.LastName" @bind:event="oninput" />
         </div>
 
-        <!-- Email -------------------------------------------------------------->
         <div class="mb-3">
             <label for="email" class="form-label">Email address</label>
-            <InputText id="email"
-                       type="email"
-                       class="form-control"
-                       @bind-Value="_model.Email" />
-            <ValidationMessage For="@(() => _model.Email)" />
+            <input id="email" type="email" class="form-control" @bind="_model.Email" @bind:event="oninput" />
         </div>
 
-        <!-- Password ----------------------------------------------------------->
         <div class="mb-3">
             <label for="password" class="form-label">Password</label>
-            <InputText id="password"
-                       type="password"
-                       class="form-control"
-                       @bind-Value="_model.Password" />
-            <ValidationMessage For="@(() => _model.Password)" />
+            <input id="password" type="password" class="form-control" @bind="_model.Password" @bind:event="oninput" />
         </div>
 
-        <!-- Confirm password --------------------------------------------------->
-        <div class="mb-3">
+        <div class="mb-4">
             <label for="confirmPassword" class="form-label">Confirm password</label>
-            <InputText id="confirmPassword"
-                       type="password"
-                       class="form-control"
-                       @bind-Value="_model.ConfirmPassword" />
-            <ValidationMessage For="@(() => _model.ConfirmPassword)" />
+            <input id="confirmPassword" type="password" class="form-control" @bind="_model.ConfirmPassword" @bind:event="oninput" />
+            @if (_passwordMismatch)
+            {
+                <small class="text-danger">Passwords do not match.</small>
+            }
         </div>
 
-        @* Global error that comes back from the service (duplicate e‑mail, etc.) *@
-        @if (!_isBusy && !string.IsNullOrWhiteSpace(_errorMessage))
+        @if (!string.IsNullOrWhiteSpace(_errorMessage))
         {
-            <div class="alert alert-danger">@_errorMessage</div>
+            <div class="alert alert-danger py-2">@_errorMessage</div>
         }
 
-        <!-- Submit button ------------------------------------------------------ -->
-        <button type="submit"
-                class="btn btn-primary w-100"
-                disabled="@(!_allFieldsFilled || _isBusy)">
-            @if (_isBusy)
-            {
-                <span class="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"></span>
-                @:Signing up...
-            }
-            else
-            {
-                @:Sign up
-            }
-        </button>
+        <div class="d-grid">
+            <button type="button" class="btn btn-primary" @onclick="HandleSubmit" disabled="@(!_allFieldsFilled || _isBusy)">
+                @if (_isBusy)
+                {
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    @:Signing up...
+                }
+                else
+                {
+                    @:Sign up
+                }
+            </button>
+        </div>
 
         <div class="mt-3 text-center">
             Already have an account? <a href="/login">Log in</a>
         </div>
-    </EditForm>
+    </div>
 </div>
 
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+    }
+
+    .signup-page-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        width: 100%;
+    }
+
+    .signup-panel {
+        width: 100%;
+        max-width: 400px;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        background: rgba(255, 255, 255, 0.7);
+        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(200, 200, 200, 0.5);
+        color: #333;
+    }
+
+    .signup-panel h3 {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .signup-panel .form-label {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .signup-panel .form-control {
+        background: rgba(255, 255, 255, 0.6);
+        border: 1px solid rgba(150, 150, 150, 0.5);
+        color: #333;
+    }
+
+    .signup-panel .form-control:focus {
+        background: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 0 0.25rem rgba(100, 100, 100, 0.1);
+        border-color: #555;
+    }
+
+    .signup-panel .btn-primary {
+        background: #4e73df;
+        border: none;
+        font-weight: bold;
+    }
+
+    .signup-panel a {
+        color: #4e73df;
+    }
+</style>
+
 @code {
-    // The form is bound to this DTO (LC360.Models.SignupRequest)
     private SignupRequest _model = new();
 
     private bool _isBusy;
     private string? _errorMessage;
-    private bool _allFieldsFilled = false;
+    private bool _passwordMismatch;
 
-    protected override void OnInitialized()
-    {
-        UpdateButtonState();
-    }
+    private bool _allFieldsFilled =>
+        !string.IsNullOrWhiteSpace(_model.FirstName) &&
+        !string.IsNullOrWhiteSpace(_model.LastName) &&
+        !string.IsNullOrWhiteSpace(_model.Email) &&
+        !string.IsNullOrWhiteSpace(_model.Password) &&
+        !string.IsNullOrWhiteSpace(_model.ConfirmPassword);
 
-    private void UpdateButtonState()
-    {
-        // Check if all required fields are filled
-        _allFieldsFilled = !string.IsNullOrWhiteSpace(_model.FirstName) &&
-                           !string.IsNullOrWhiteSpace(_model.LastName) &&
-                           !string.IsNullOrWhiteSpace(_model.Email) &&
-                           !string.IsNullOrWhiteSpace(_model.Password) &&
-                           !string.IsNullOrWhiteSpace(_model.ConfirmPassword);
-        
-        StateHasChanged();
-    }
-
-    private void HandleFieldChanged(FieldChangedEventArgs _)
-    {
-        UpdateButtonState();
-    }
-
-    private async Task HandleValidSubmit()
+    private async Task HandleSubmit()
     {
         _errorMessage = null;
+        _passwordMismatch = _model.Password != _model.ConfirmPassword;
+
+        if (_passwordMismatch) return;
+
+        if (_model.Password.Length < 6)
+        {
+            _errorMessage = "Password must be at least 6 characters.";
+            return;
+        }
+
         _isBusy = true;
 
         try
         {
             await AuthService.RegisterAsync(_model);
-            // Registration succeeded → go to the login page.
             NavManager.NavigateTo("/login?registered=1");
         }
         catch (Exception ex)
         {
-            // The service throws on any failure; surface the message.
             _errorMessage = ex.Message;
         }
         finally
